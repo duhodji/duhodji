@@ -235,7 +235,9 @@
             // 2. Color Toggle Listener (on document click)
             document.addEventListener('click', (event) => {
                 // Check if the click occurred on the language toggle or contact link and skip color toggle
-                if (event.target === langToggle || event.target === contactLink) {
+                if (event.target === langToggle || event.target === contactLink || event.target === placeholderIcon ||
+                    event.target === centralContentWrapper || event.target === nameText || 
+                    event.target === centralTextContainer || event.target === titleText ) {
                     return;
                 }
                 isDark = !isDark;
@@ -257,5 +259,5 @@
     </script>
 
 </body>
-
 </html>
+
