@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact du hodji</title>
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom fonts: Montserrat (Default), Gaegu (Title) */
+        @import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Montserrat:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif; /* Everything else */
+            background-color: #4a4a4a; /* Initial default dark background */
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Target Title with Gaegu */
+        #pageTitle {
+            font-family: 'Gaegu', cursive;
+            font-weight: 700;
+        }
+
+        /* Base styling for form inputs */
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border-width: 1px;
+            border-radius: 0.5rem; /* rounded-lg */
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        /* Dark mode input styles */
+        .input-dark {
+            background-color: #5a5a5a; /* Slightly lighter than body for contrast */
+            border-color: #6a6a6a;
+            color: #f2f2f2;
+        }
+        .input-dark:focus {
+            border-color: #f2f2f2;
+        }
+
+        /* Light mode input styles */
+        .input-light {
+            background-color: #ffffff;
+            border-color: #cccccc;
+            color: #333333;
+        }
+        .input-light:focus {
+            border-color: #4a4a4a;
+        }
+        
+        /* Loading indicator for the button */
+        .button-loading {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body id="pageBody" class="flex flex-col items-center pt-8 md:pt-16 px-4">
+
+    <!-- Return Link -->
+    <div class="w-full max-w-xl md:max-w-2xl lg:max-w-3xl mb-8 flex justify-start">
+        <a id="homeLink" href="index.html" class="text-sm font-medium transition-colors duration-300 hover:underline">
+            <!-- Text set by JS: ← Return to Home -->
+        </a>
+    </div>
+
+    <div class="w-full max-w-xl md:max-w-2xl lg:max-w-3xl flex flex-col items-center">
+        
+        <!-- Page Title -->
+        <h1 id="pageTitle" class="text-4xl sm:text-5xl md:text-6xl text-gray-100 mb-10 transition-colors duration-500">
+            <!-- Text set by JS: Contact du hodji -->
+        </h1>
+
+        <!-- Contact Form -->
+        <!-- NOTE: The 'action' URL and 'name' attributes must be your Google Form's specific endpoint and entry IDs. -->
+        <form id="contactForm" method="POST" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSdiTVc4jU51YxhdDA0Xy0nyWpDMWDpLgcgh-sS3DwuSI7Cbbw/formResponse" class="w-full space-y-6">
+
+            <!-- Name Field -->
+            <div>
+                <label for="name" id="nameLabel" class="block text-sm font-medium mb-2 text-gray-200">Name</label>
+                <input type="text" id="name" name="entry.2005620554" required 
+                       class="form-input" placeholder="Your name">
+            </div>
+
+            <!-- Email Field -->
+            <div>
+                <label for="email" id="emailLabel" class="block text-sm font-medium mb-2 text-gray-200">Email</label>
+                <input type="email" id="email" name="entry.1045781291" required 
+                       class="form-input" placeholder="you@example.com">
+            </div>
+
+            <!-- Message Field -->
+            <div>
+                <label for="message" id="messageLabel" class="block text-sm font-medium mb-2 text-gray-200">Message</label>
+                <textarea id="message" name="entry.839337160" rows="6" required 
+                          class="form-input" placeholder="Type your message here..."></textarea>
+            </div>
+
+            <!-- Send Button -->
+            <button type="submit" id="sendButton" class="w-full py-3 mt-4 text-white font-semibold rounded-lg 
+                                                    bg-gray-600 hover:bg-gray-700 transition-colors duration-300 
+                                                    focus:outline-none focus:ring-4 focus:ring-gray-300/50">
+                Send Message
+            </button>
+        </form>
+
+        <!-- Status Message Placeholder -->
+        <p id="successMessage" class="mt-8 hidden text-lg font-semibold transition-opacity duration-500">
+            <!-- Message set by JS -->
+        </p>
+    </div>
+
+    <script>
+        // Start of IIFE to prevent variable conflicts
+        (function() {
+            // Function to extract a query parameter from the URL
+            function getQueryParam(param) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+            
+            // Check URL for theme parameter. Defaults to dark (isDark = true)
+            const themeParam = getQueryParam('theme');
+            let isDark = !(themeParam && themeParam.toLowerCase() === 'light');
+
+            // NEW: Check URL for language parameter, defaults to English
+            const langParam = getQueryParam('lang');
+            let isEnglish = !(langParam && langParam.toLowerCase() === 'pt');
+
+            // --- Theme Logic Variables ---
+            const THEMES = {
+                dark: {
+                    bg: '#4a4a4a',
+                    text: 'text-gray-100',
+                    label: 'text-gray-200',
+                    link: 'text-gray-400 hover:text-gray-200',
+                    buttonBg: 'bg-gray-600 hover:bg-gray-700 focus:ring-gray-300/50',
+                    input: 'input-dark'
+                },
+                light: {
+                    bg: '#f2f2f2',
+                    text: 'text-gray-800',
+                    label: 'text-gray-700',
+                    link: 'text-gray-700 hover:text-gray-900',
+                    buttonBg: 'bg-gray-400 hover:bg-gray-500 focus:ring-gray-800/50',
+                    input: 'input-light'
+                }
+            };
+            
+            // NEW: Language Map
+            const LANGUAGE_MAP = {
+                en: {
+                    title: 'Contact du hodji',
+                    name: 'Name',
+                    email: 'Email',
+                    message: 'Message',
+                    returnLink: '← Return to Home',
+                    button: 'Send Message',
+                    namePlaceholder: 'Your name',
+                    messagePlaceholder: 'Type your message here...',
+                    success: 'Message sent successfully!',
+                    error: 'Error: Failed to send message. Please check your form IDs/URL.'
+                },
+                pt: {
+                    title: 'Contate du hodji',
+                    name: 'Nome',
+                    email: 'Email',
+                    message: 'Mensagem',
+                    returnLink: '← Retorne à Home',
+                    button: 'Envie a mensagem',
+                    namePlaceholder: 'Seu nome',
+                    messagePlaceholder: 'Digite sua mensagem aqui...',
+                    success: 'Mensagem enviada com sucesso!',
+                    error: 'Erro: Falha ao enviar a mensagem. Verifique seus IDs de formulário/URL.'
+                }
+            };
+
+            // Element references
+            const body = document.getElementById('pageBody');
+            const title = document.getElementById('pageTitle');
+            const homeLink = document.getElementById('homeLink');
+            const nameLabel = document.getElementById('nameLabel');
+            const emailLabel = document.getElementById('emailLabel');
+            const messageLabel = document.getElementById('messageLabel');
+            const nameInput = document.getElementById('name');
+            const messageInput = document.getElementById('message');
+            const sendButton = document.getElementById('sendButton');
+            const form = document.getElementById('contactForm');
+            const successMessage = document.getElementById('successMessage');
+
+
+            // --- Functions ---
+
+            function getCurrentLang() {
+                return isEnglish ? LANGUAGE_MAP.en : LANGUAGE_MAP.pt;
+            }
+
+            function updateLanguage(toEnglish) {
+                isEnglish = toEnglish;
+                const lang = getCurrentLang();
+                
+                // Update Title
+                title.textContent = lang.title;
+                document.title = lang.title; // Update browser title
+
+                // Update Labels
+                nameLabel.textContent = lang.name;
+                emailLabel.textContent = lang.email;
+                messageLabel.textContent = lang.message;
+                
+                // Update Placeholders
+                nameInput.placeholder = lang.namePlaceholder;
+                messageInput.placeholder = lang.messagePlaceholder;
+
+                // Update Return Link Text
+                homeLink.textContent = lang.returnLink;
+                
+                // Update Button Text
+                sendButton.textContent = lang.button;
+
+                // Re-apply theme to ensure the home link URL is updated with the new language
+                applyTheme(isDark);
+            }
+
+            function applyTheme(isDarkTheme) {
+                const currentTheme = isDarkTheme ? THEMES.dark : THEMES.light;
+                const oppositeTheme = isDarkTheme ? THEMES.light : THEMES.dark;
+                
+                // 1. Update body background color
+                body.style.backgroundColor = currentTheme.bg;
+
+                // 2. Update Title color
+                title.classList.remove(oppositeTheme.text);
+                title.classList.add(currentTheme.text);
+
+                // 3. Update Label colors
+                [nameLabel, emailLabel, messageLabel].forEach(el => {
+                    el.classList.remove(oppositeTheme.label);
+                    el.classList.add(currentTheme.label);
+                });
+
+                // 4. Update Inputs classes
+                document.querySelectorAll('.form-input').forEach(input => {
+                    input.classList.remove(oppositeTheme.input);
+                    input.classList.add(currentTheme.input);
+                });
+                
+                // 5. Update Home Link color
+                homeLink.classList.remove(...THEMES.dark.link.split(' '), ...THEMES.light.link.split(' '));
+                homeLink.classList.add(...currentTheme.link.split(' '));
+                
+                // 6. Update Button style
+                sendButton.classList.remove(...THEMES.dark.buttonBg.split(' '), ...THEMES.light.buttonBg.split(' '));
+                sendButton.classList.add(...currentTheme.buttonBg.split(' '));
+
+                // 7. Update Home Link HREF to pass the current theme AND language
+                const themeQuery = isDarkTheme ? 'dark' : 'light';
+                const langQuery = isEnglish ? 'en' : 'pt';
+                homeLink.href = `index.html?theme=${themeQuery}&lang=${langQuery}`;
+            }
+
+            // --- Form Submission using Fetch (NEW LOGIC) ---
+            
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault(); 
+                const lang = getCurrentLang();
+
+                // 1. Loading State
+                sendButton.textContent = lang.button.replace(isEnglish ? 'Send' : 'Envie', isEnglish ? 'Sending...' : 'Enviando...');
+                sendButton.disabled = true;
+                sendButton.classList.add('button-loading');
+
+                // 2. Prepare Data
+                const formData = new FormData(form);
+                const urlEncodedData = new URLSearchParams(formData).toString();
+                
+                // Reset message visibility
+                successMessage.classList.add('hidden', 'opacity-0');
+
+                try {
+                    // Google Forms submission requires 'POST' and 'no-cors' mode 
+                    // to prevent browser CORS restrictions from blocking the request.
+                    await fetch(form.action, {
+                        method: 'POST',
+                        mode: 'no-cors', 
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: urlEncodedData
+                    });
+
+                    // 3. Success State
+                    successMessage.textContent = lang.success;
+                    successMessage.classList.remove('hidden', 'text-red-400', 'opacity-0');
+                    successMessage.classList.add('text-green-400', 'opacity-100');
+                    form.reset();
+
+                } catch (error) {
+                    // 4. Error State
+                    successMessage.textContent = lang.error;
+                    successMessage.classList.remove('hidden', 'text-green-400', 'opacity-0');
+                    successMessage.classList.add('text-red-400', 'opacity-100');
+                    console.error("Form Submission Error:", error);
+                } finally {
+                    // 5. Reset State after delay
+                    setTimeout(() => {
+                        sendButton.textContent = lang.button;
+                        sendButton.disabled = false;
+                        sendButton.classList.remove('button-loading');
+                        successMessage.classList.remove('opacity-100');
+                        successMessage.classList.add('opacity-0'); // Use opacity transition to hide smoothly
+                        
+                        // Wait for transition before setting to hidden
+                        setTimeout(() => successMessage.classList.add('hidden'), 500);
+                        
+                    }, 3000);
+                }
+            });
+
+
+            // --- Initialization ---
+            // Set initial language texts and update the theme 
+            updateLanguage(isEnglish); 
+
+        })();
+    </script>
+
+</body>
+</html>
