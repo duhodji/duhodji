@@ -181,6 +181,7 @@
                 <!-- CUSTOM CONTACT FORM -->
                 <form id="contact-form" class="space-y-6">
                     <!-- IMPORTANT: The 'name' attributes below (entry.XXX) MUST be updated to match the actual input IDs of your specific Google Form. -->
+                    <!-- (see FORM_SUBMISSION_URL section for details -->
                     
                     <!-- Name Field -->
                     <div>
@@ -250,7 +251,8 @@
 
         // Google Form Submission URL (must use /formResponse endpoint)
         const FORM_SUBMISSION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdiTVc4jU51YxhdDA0Xy0nyWpDMWDpLgcgh-sS3DwuSI7Cbbw/formResponse';
-
+        // to get the url, go to the form, select the three dots, select pre-fill, fill the form with dummy data, select get link. 
+        // The link will contain the form id that you replace between /d/e/ and /formResponse, and the entry.9999999 that you need further down for the fields.
 
         const CONTENT = {
             en: {
@@ -565,6 +567,7 @@
 
 </body>
 </html>
+
 
 
 
