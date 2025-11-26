@@ -1,583 +1,490 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>du hodji - fiction writer</title>
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Use Inter, Gaegu, and Lekton fonts -->
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Gaegu:wght@300;400;700&family=Lekton:ital,wght@0,400;0,700;1,400&display=swap');
-        
-        /* Default body font remains Inter */
-        body {
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.5s, color 0.5s;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>du hodji - fiction writer</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Gaegu:wght@300;400;700&family=Lekton:ital,wght@0,400;0,700;1,400&display=swap');
+        
+        /* Default body font remains Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.5s, color 0.5s;
+        }
 
-        /* New custom font classes */
-        .font-gaegu { font-family: 'Gaegu', cursive; }
-        .font-lekton { font-family: 'Lekton', monospace; }
+        /* New custom font classes */
+        .font-gaegu { font-family: 'Gaegu', cursive; }
+        .font-lekton { font-family: 'Lekton', monospace; }
 
-        /* Define CSS Variables for dynamic colors */
-        :root {
-            --bg: #f2f2f2;
-            --text: #4a4a4a;
-            --accent: #6b7280; /* Neutral accent color */
-        }
-        
-        /* Apply variables to Tailwind classes */
-        .theme-bg { background-color: var(--bg); }
-        .theme-text { color: var(--text); }
-        .theme-border { border-color: var(--text); }
-        
-        /* FIX: Simplify control button hover to use opacity for guaranteed visibility */
-        .theme-accent-hover:hover { 
-            opacity: 0.8;
-        }
+        /* Define CSS Variables for dynamic colors */
+        :root {
+            --bg: #f2f2f2;
+            --text: #4a4a4a;
+            --accent: #6b7280; /* Neutral accent color */
+        }
+        
+        /* Apply variables to Tailwind classes */
+        .theme-bg { background-color: var(--bg); }
+        .theme-text { color: var(--text); }
+        .theme-border { border-color: var(--text); }
+        
+        /* FIX: Simplify control button hover to use opacity for guaranteed visibility */
+        .theme-accent-hover:hover { 
+            opacity: 0.8;
+        }
 
-        /* Custom style for the main card container */
-        #card-container {
-            /* Now relies on Tailwind classes for border/rounding */
-            position: relative; 
-            z-index: 10;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            cursor: pointer;
-        }
-        
-        /* Keep hover effect: slight lift and shadow */
-        #card-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Slight shadow only on hover */
-        }
+        /* Custom style for the main card container */
+        #card-container {
+            /* Now relies on Tailwind classes for border/rounding */
+            position: relative; 
+            z-index: 10;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        
+        /* Keep hover effect: slight lift and shadow */
+        #card-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Slight shadow only on hover */
+        }
 
-        /* Bio overlay styling */
-        .bio-overlay {
-            opacity: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: opacity 0.5s ease, max-height 0.5s ease;
-        }
-        .bio-overlay.visible {
-            opacity: 1;
-            max-height: 500px; /* Large enough for content */
-            padding-top: 1rem;
-        }
-        
-        /* Contact Overlay Styling */
-        #contact-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* Bio overlay styling */
+        .bio-overlay {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.5s ease, max-height 0.5s ease;
+        }
+        .bio-overlay.visible {
+            opacity: 1;
+            max-height: 500px; /* Large enough for content */
+            padding-top: 1rem;
+        }
+        
+        /* Contact Overlay Styling */
+        #contact-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 50;
+            transform: translateX(100%);
+            transition: transform 0.5s ease-in-out;
+            overflow-y: auto;
+        }
+        #contact-overlay.visible {
+            transform: translateX(0);
+        }
+
+        /* Custom style for the submit button to use dynamic colors */
+        #submit-button {
+            background-color: var(--text);
+            color: var(--bg);
+            transition: background-color 0.3s, color 0.3s, opacity 0.3s; /* Added opacity transition */
+        }
+        /* FIX: Use opacity reduction for hover instead of relying on var(--accent) 
+           which was causing the button to disappear. */
+        #submit-button:hover:not(:disabled) {
+            opacity: 0.85; 
+            background-color: var(--text); /* Keep original background color */
+            color: var(--bg); /* Keep original text color */
+        }
+        /* Disable state styling */
+        #submit-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* NEW: Style the iframe to fit the container */
+        .embedded-form-iframe {
             width: 100%;
             height: 100%;
-            z-index: 50;
-            transform: translateX(100%);
-            transition: transform 0.5s ease-in-out;
-            overflow-y: auto;
+            min-height: 600px; /* Ensure a decent size */
         }
-        #contact-overlay.visible {
-            transform: translateX(0);
-        }
-
-        /* Custom style for the submit button to use dynamic colors */
-        #submit-button {
-            background-color: var(--text);
-            color: var(--bg);
-            transition: background-color 0.3s, color 0.3s, opacity 0.3s; /* Added opacity transition */
-        }
-        /* FIX: Use opacity reduction for hover instead of relying on var(--accent) 
-           which was causing the button to disappear. */
-        #submit-button:hover:not(:disabled) {
-            opacity: 0.85; 
-            background-color: var(--text); /* Keep original background color */
-            color: var(--bg); /* Keep original text color */
-        }
-        /* Disable state styling */
-        #submit-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-    </style>
+    </style>
 </head>
 <body class="theme-bg theme-text min-h-screen flex flex-col justify-center items-center p-4">
 
-    <!-- Controls Bar (Top Right - FOR CARD VIEW) -->
-    <div class="fixed top-0 right-0 p-4 space-x-2 flex text-sm z-20">
-        <!-- Combined Language Toggle Button (Position 1) -->
-        <button id="lang-toggle-card" class="theme-text hover:theme-accent-hover p-2 rounded-lg font-bold transition duration-300">
-            <span id="lang-icon-card"></span>
-        </button>
-        <!-- Theme Toggle Button (Icon only) - Position 2 -->
-        <button id="theme-toggle-card" class="theme-text hover:theme-accent-hover p-2 rounded-lg font-medium transition duration-300">
-            <span id="theme-icon-card" class="flex items-center justify-center"></span>
-        </button>
-        <!-- Contact Link (Envelope Icon) - Position 3 -->
-        <button id="contact-link" class="theme-text hover:theme-accent-hover p-2 rounded-lg font-medium transition duration-300">
-            <!-- Envelope SVG Icon -->
-            <svg id="contact-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
-                <rect width="20" height="16" x="2" y="4" rx="2"/>
-                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-            </svg>
-        </button>
-    </div>
+        <div class="fixed top-0 right-0 p-4 space-x-2 flex text-sm z-20">
+                <button id="lang-toggle-card" class="theme-text hover:theme-accent-hover p-2 rounded-lg font-bold transition duration-300">
+            <span id="lang-icon-card"></span>
+        </button>
+                <button id="theme-toggle-card" class="theme-text hover:theme-accent-hover p-2 rounded-lg font-medium transition duration-300">
+            <span id="theme-icon-card" class="flex items-center justify-center"></span>
+        </button>
+                <button id="contact-link" class="theme-text hover:theme-accent-hover p-2 rounded-lg font-medium transition duration-300">
+                        <svg id="contact-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                <rect width="20" height="16" x="2" y="4" rx="2"/>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+        </button>
+        <p class="text-xs mt-2 opacity-50 theme-text" id="click-prompt">(Click or hover for bio)</p>
 
-    <!-- Main Business Card Container -->
-    <div id="card-container" class="w-full max-w-lg p-6 md:p-10 border-2 rounded-xl theme-border theme-bg">
-        <!-- Logo, Name, and Title Section -->
-        <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
-            
-            <!-- Logo Placeholder Container -->
-            <div class="flex-shrink-0 w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden flex items-center justify-center">
-                <!-- Placeholder Image - will be updated by JS -->
-                <img id="logo-img" src="" alt="Bo Dobzi Logo Placeholder" class="w-full h-full object-cover p-2">
-            </div>
-            
-            <!-- Name and Title -->
-            <div class="text-center md:text-left">
-                <!-- Applied Gaegu font -->
-                <h1 id="name" class="text-4xl md:text-5xl font-extrabold mb-1 theme-text font-gaegu">Bo Dobzi</h1>
-                <!-- Applied Gaegu font -->
-                <h2 id="title" class="text-xl md:text-2xl font-light opacity-75 theme-text font-gaegu">Fiction Writer</h2>
-                <p class="text-xs mt-2 opacity-50 theme-text" id="click-prompt">(Click or hover for bio)</p>
-            </div>
-        </div>
+    </div>
 
-        <!-- Bio Content (Initially Hidden) -->
-        <div id="bio-content" class="bio-overlay text-center md:text-left rounded-lg p-4 mt-4">
-            <!-- Applied Lekton font -->
-            <p id="bio-text" class="text-base font-normal leading-relaxed font-lekton"></p>
-        </div>
-        
-    </div>
-    
-    <!-- CONTACT FORM OVERLAY -->
-    <div id="contact-overlay" class="theme-bg p-4 flex flex-col">
-        
-        <!-- Controls Bar (Top Right - FOR CONTACT VIEW) -->
-        <div class="flex justify-end p-4 space-x-2 flex-shrink-0">
-            <!-- Back Button -->
-            <button id="back-button" class="theme-text hover:theme-accent-hover p-2 rounded-lg font-medium transition duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
-            
-            <!-- Language Toggle Button (Replicated) -->
-            <button id="lang-toggle-contact" class="theme-text hover:theme-accent-hover p-2 rounded-lg font-bold transition duration-300">
-                <span id="lang-icon-contact"></span>
-            </button>
-            
-            <!-- Theme Toggle Button (Replicated) -->
-            <button id="theme-toggle-contact" class="theme-text hover:theme-accent-hover p-2 rounded-lg font-medium transition duration-300">
-                <span id="theme-icon-contact" class="flex items-center justify-center"></span>
-            </button>
-        </div>
+        <div id="card-container" class="w-full max-w-lg p-6 md:p-10 border-2 rounded-xl theme-border theme-bg">
+                <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+            
+                        <div class="flex-shrink-0 w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden flex items-center justify-center">
+                                <img id="logo-img" src="" alt="Bo Dobzi Logo Placeholder" class="w-full h-full object-cover p-2">
+            </div>
+            
+                        <div class="text-center md:text-left">
+                                <h1 id="name" class="text-4xl md:text-5xl font-extrabold mb-1 theme-text font-gaegu">Bo Dobzi</h1>
+                                <h2 id="title" class="text-xl md:text-2xl font-light opacity-75 theme-text font-gaegu">Fiction Writer</h2>
+            </div>
+        </div>
 
-        <!-- Contact Form Wrapper -->
-        <div class="flex-grow flex justify-center items-start pt-10 pb-20 px-4">
-            <div class="w-full max-w-lg theme-bg border-2 theme-border rounded-xl shadow-2xl p-6 md:p-10">
-                <h2 id="contact-header" class="text-3xl font-gaegu font-bold mb-6 theme-text text-center">Contact</h2>
-                
-                <!-- CUSTOM CONTACT FORM -->
-                <form id="contact-form" class="space-y-6">
-                    <!-- IMPORTANT: The 'name' attributes below (entry.XXX) MUST be updated to match the actual input IDs of your specific Google Form. -->
-                    <!-- (see FORM_SUBMISSION_URL section for details -->
-                    
-                    <!-- Name Field -->
-                    <div>
-                        <label for="name-input" id="label-name" class="block text-sm font-medium theme-text mb-1">Your Name</label>
-                        <input type="text" id="name-input" name="entry.2005620554" required class="w-full p-3 border-2 theme-border theme-bg rounded-lg focus:ring-2 focus:ring-[--text] focus:border-transparent outline-none">
-                    </div>
+                <div id="bio-content" class="bio-overlay text-center md:text-left rounded-lg p-4 mt-4">
+                        <p id="bio-text" class="text-base font-normal leading-relaxed font-lekton"></p>
+        </div>
+        
+    </div>
+    
+        <div id="contact-overlay" class="theme-bg p-4 flex flex-col">
+        
+                <div class="flex justify-end p-4 space-x-2 flex-shrink-0">
+                        <button id="back-button" class="theme-text hover:theme-accent-hover p-2 rounded-lg font-medium transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            
+                        <button id="lang-toggle-contact" class="theme-text hover:theme-accent-hover p-2 rounded-lg font-bold transition duration-300">
+                <span id="lang-icon-contact"></span>
+            </button>
+            
+                        <button id="theme-toggle-contact" class="theme-text hover:theme-accent-hover p-2 rounded-lg font-medium transition duration-300">
+                <span id="theme-icon-contact" class="flex items-center justify-center"></span>
+            </button>
+        </div>
 
-                    <!-- Email Field -->
-                    <div>
-                        <label for="email-input" id="label-email" class="block text-sm font-medium theme-text mb-1">Your Email</label>
-                        <input type="email" id="email-input" name="entry.1045781291" required class="w-full p-3 border-2 theme-border theme-bg rounded-lg focus:ring-2 focus:ring-[--text] focus:border-transparent outline-none">
-                    </div>
+                <div class="flex-grow flex justify-center items-start pt-10 pb-20 px-4">
+            <div class="w-full max-w-lg theme-bg border-2 theme-border rounded-xl shadow-2xl p-6 md:p-10 flex flex-col items-center">
+                <h2 id="contact-header" class="text-3xl font-gaegu font-bold mb-6 theme-text text-center">Contact</h2>
+                
+                <iframe 
+                    src="https://docs.google.com/forms/d/e/1FAIpQLSdiTVc4jU51YxhdDA0Xy0nyWpDMWDpLgcgh-sS3DwuSI7Cbbw/viewform?embedded=true" 
+                    class="embedded-form-iframe" 
+                    frameborder="0" 
+                    marginheight="0" 
+                    marginwidth="0"
+                >Loading…</iframe>
+                
+                <p id="contact-footer" class="text-xs opacity-50 theme-text mt-4 text-center">Your message will be sent securely.</p>
+            </div>
+        </div>
 
-                    <!-- Message Field -->
-                    <div>
-                        <label for="message-input" id="label-message" class="block text-sm font-medium theme-text mb-1">Message</label>
-                        <textarea id="message-input" name="entry.839337160" rows="5" required class="w-full p-3 border-2 theme-border theme-bg rounded-lg focus:ring-2 focus:ring-[--text] focus:border-transparent outline-none resize-none"></textarea>
-                    </div>
+    </div>
 
-                    <!-- Submit Button -->
-                    <button type="submit" id="submit-button" class="w-full py-3 rounded-lg font-bold transition duration-300" disabled>
-                        Send Message
-                    </button>
+        <script>
+        // --- SVG Definitions for Theme Icons ---
+        const SUN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
 
-                    <div id="form-message" class="text-center font-medium mt-4"></div>
-                </form>
-                
-                <p id="contact-footer" class="text-xs opacity-50 theme-text mt-4 text-center">Your message will be sent securely.</p>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- JavaScript Logic -->
-    <script>
-        // --- SVG Definitions for Theme Icons ---
-        const SUN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
-
-        const MOON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+        const MOON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
 
 
-        // --- Configuration ---
-        // Updated schemes based on user request:
-        const COLOR_SCHEMES = [
-            // Scheme 0: [LightBG, LightText, DarkBG, DarkText] - Grey/White
-            ['#f2f2f2', '#4a4a4a', '#4a4a4a', '#f2f2f2'], 
-            // Scheme 1: [LightBG, LightText, DarkBG, DarkText] - Cream/Maroon
-            ['#f0ebe7', '#554040', '#554040', '#f0ebe7'], 
-            // Scheme 2: [LightBG, LightText, DarkBG, DarkText] - Mint/Moss
-            ['#e7f0e7', '#4a504a', '#4a504a', '#e7f0e7'], 
-            // Scheme 3: [LightBG, LightText, DarkBG, DarkText] - Lavender/Indigo
-            ['#faf7ff', '#3e375d', '#3e375d', '#faf7ff']
-        ];
+        // --- Configuration ---
+        // Updated schemes based on user request:
+        const COLOR_SCHEMES = [
+            // Scheme 0: [LightBG, LightText, DarkBG, DarkText] - Grey/White
+            ['#f2f2f2', '#4a4a4a', '#4a4a4a', '#f2f2f2'], 
+            // Scheme 1: [LightBG, LightText, DarkBG, DarkText] - Cream/Maroon
+            ['#f0ebe7', '#554040', '#554040', '#f0ebe7'], 
+            // Scheme 2: [LightBG, LightText, DarkBG, DarkText] - Mint/Moss
+            ['#e7f0e7', '#4a504a', '#4a504a', '#e7f0e7'], 
+            // Scheme 3: [LightBG, LightText, DarkBG, DarkText] - Lavender/Indigo
+            ['#faf7ff', '#3e375d', '#3e375d', '#faf7ff']
+        ];
 
-        // NEW: Map of logo image URLs based on scheme index and mode
-        const LOGO_IMAGES = [
-            // Scheme 0: Grey/White
-            { day: "duhodji_bk_dy.png", night: "duhodji_bk_nt.png" },
-            // Scheme 1: Cream/Maroon
-            { day: "duhodji_rd_dy.png", night: "duhodji_rd_nt.png" },
-            // Scheme 2: Mint/Moss
-            { day: "duhodji_gn_dy.png", night: "duhodji_gn_nt.png" },
-            // Scheme 3: Lavender/Indigo
-            { day: "duhodji_be_dy.png", night: "duhodji_be_nt.png" }
-        ];
-        // IMPORTANT: Replace the "PATH/TO/..." strings above with your actual image URLs.
+        // NEW: Map of logo image URLs based on scheme index and mode
+        const LOGO_IMAGES = [
+            // Scheme 0: Grey/White
+            { day: "duhodji_bk_dy.png", night: "duhodji_bk_nt.png" },
+            // Scheme 1: Cream/Maroon
+            { day: "duhodji_rd_dy.png", night: "duhodji_rd_nt.png" },
+            // Scheme 2: Mint/Moss
+            { day: "duhodji_gn_dy.png", night: "duhodji_gn_nt.png" },
+            // Scheme 3: Lavender/Indigo
+            { day: "duhodji_be_dy.png", night: "duhodji_be_nt.png" }
+        ];
+        // IMPORTANT: Replace the "PATH/TO/..." strings above with your actual image URLs.
 
-        // Google Form Submission URL (must use /formResponse endpoint)
-        const FORM_SUBMISSION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdiTVc4jU51YxhdDA0Xy0nyWpDMWDpLgcgh-sS3DwuSI7Cbbw/formResponse';
-        // to get the url, go to the form, select the three dots, select pre-fill, fill the form with dummy data, select get link. 
-        // The link will contain the form id that you replace between /d/e/ and /formResponse, and the entry.9999999 that you need further down for the fields.
+        // The custom submission URL is no longer needed since we are using the embedded form.
+        // const FORM_SUBMISSION_URL = '...';
 
-        const CONTENT = {
-            en: {
-                name: "du hodji",
-                title: "fiction writer",
-                bio: "du hodji is a Brazilian author currently living in New York. He writes short stories in English and Portuguese. When he is not writing or earning a living, he is doing black and white film photography.",
-                contactHeader: "Contact",
-                contactFooter: "Your message will be sent securely.",
-                modeTextDay: "Day Mode",
-                modeTextNight: "Night Mode",
-                clickPrompt: "(Click for bio)",
-                labelName: "Your Name",
-                labelEmail: "Your Email",
-                labelMessage: "Message",
-                buttonSend: "Send Message",
-                msgSuccess: "Message sent! Thank you for reaching out.",
-                msgError: "Error sending message. Please try again later."
-            },
-            pt: {
-                name: "du hodji",
-                title: "ficcionista",
-                bio: "du hodji é um autor brasileiro atualmente residindo em Nova York. Ele escreve contos em português e inglês. Quando não está escrevendo ou trabalhando para pagar as contas, ele se dedica à fotografia em filme preto e branco.",
-                contactHeader: "Contato",
-                contactFooter: "A sua mensagem será enviada com segurança.",
-                modeTextDay: "Modo Dia",
-                modeTextNight: "Modo Noite",
-                clickPrompt: "(Clique para a nota biográfica)",
-                labelName: "Seu Nome",
-                labelEmail: "Seu Email",
-                labelMessage: "Mensagem",
-                buttonSend: "Enviar Mensagem",
-                msgSuccess: "Mensagem enviada! Obrigado por entrar em contato.",
-                msgError: "Erro ao enviar mensagem. Por favor, tente novamente mais tarde."
-            }
-        };
+        const CONTENT = {
+            en: {
+                name: "du hodji",
+                title: "fiction writer",
+                bio: "du hodji is a Brazilian author currently living in New York. He writes short stories in English and Portuguese. When he is not writing or earning a living, he is doing black and white film photography.",
+                contactHeader: "Contact",
+                contactFooter: "Your message will be sent securely.",
+                modeTextDay: "Day Mode",
+                modeTextNight: "Night Mode",
+                clickPrompt: "(Click for bio)",
+                // Removed custom form labels:
+                // labelName: "Your Name",
+                // labelEmail: "Your Email",
+                // labelMessage: "Message",
+                // buttonSend: "Send Message",
+                // msgSuccess: "Message sent! Thank you for reaching out.",
+                // msgError: "Error sending message. Please try again later."
+            },
+            pt: {
+                name: "du hodji",
+                title: "ficcionista",
+                bio: "du hodji é um autor brasileiro atualmente residindo em Nova York. Ele escreve contos em português e inglês. Quando não está escrevendo ou trabalhando para pagar as contas, ele se dedica à fotografia em filme preto e branco.",
+                contactHeader: "Contato",
+                contactFooter: "A sua mensagem será enviada com segurança.",
+                modeTextDay: "Modo Dia",
+                modeTextNight: "Modo Noite",
+                clickPrompt: "(Clique para a nota biográfica)",
+                // Removed custom form labels:
+                // labelName: "Seu Nome",
+                // labelEmail: "Seu Email",
+                // labelMessage: "Mensagem",
+                // buttonSend: "Enviar Mensagem",
+                // msgSuccess: "Mensagem enviada! Obrigado por entrar em contato.",
+                // msgError: "Erro ao enviar mensagem. Por favor, tente novamente mais tarde."
+            }
+        };
 
-        // --- State ---
-        let currentSchemeIndex = 0;
-        let isDayMode = true;
-        let currentLanguage = 'en';
-        let bioVisible = false;
-        let toggleCount = 0; // Tracks toggle operations for scheme change
+        // --- State ---
+        let currentSchemeIndex = 0;
+        let isDayMode = true;
+        let currentLanguage = 'en';
+        let bioVisible = false;
+        let toggleCount = 0; // Tracks toggle operations for scheme change
 
-        // --- DOM Elements ---
-        const body = document.body;
-        const root = document.documentElement.style;
-        
-        // Card Toggles
-        const themeToggleCard = document.getElementById('theme-toggle-card');
-        const themeIconCard = document.getElementById('theme-icon-card');
-        const langToggleCard = document.getElementById('lang-toggle-card');
-        const langIconCard = document.getElementById('lang-icon-card');
-        const contactLink = document.getElementById('contact-link'); // Envelope button
-        
-        // Contact Overlay Toggles
-        const contactOverlay = document.getElementById('contact-overlay');
-        const backButton = document.getElementById('back-button');
-        const themeToggleContact = document.getElementById('theme-toggle-contact');
-        const themeIconContact = document.getElementById('theme-icon-contact');
-        const langToggleContact = document.getElementById('lang-toggle-contact');
-        const langIconContact = document.getElementById('lang-icon-contact');
-
-
-        const cardContainer = document.getElementById('card-container');
-        const bioContent = document.getElementById('bio-content');
-        const logoImg = document.getElementById('logo-img');
-        const contactHeader = document.getElementById('contact-header');
-        const contactFooter = document.getElementById('contact-footer');
-        
-        // New form elements
-        const contactForm = document.getElementById('contact-form');
-        const submitButton = document.getElementById('submit-button');
-        const formMessage = document.getElementById('form-message');
+        // --- DOM Elements ---
+        const body = document.body;
+        const root = document.documentElement.style;
+        
+        // Card Toggles
+        const themeToggleCard = document.getElementById('theme-toggle-card');
+        const themeIconCard = document.getElementById('theme-icon-card');
+        const langToggleCard = document.getElementById('lang-toggle-card');
+        const langIconCard = document.getElementById('lang-icon-card');
+        const contactLink = document.getElementById('contact-link'); // Envelope button
+        
+        // Contact Overlay Toggles
+        const contactOverlay = document.getElementById('contact-overlay');
+        const backButton = document.getElementById('back-button');
+        const themeToggleContact = document.getElementById('theme-toggle-contact');
+        const themeIconContact = document.getElementById('theme-icon-contact');
+        const langToggleContact = document.getElementById('lang-toggle-contact');
+        const langIconContact = document.getElementById('lang-icon-contact');
 
 
-        // --- Core Functions ---
+        const cardContainer = document.getElementById('card-container');
+        const bioContent = document.getElementById('bio-content');
+        const logoImg = document.getElementById('logo-img');
+        const contactHeader = document.getElementById('contact-header');
+        const contactFooter = document.getElementById('contact-footer');
+        
+        // Removed custom form elements:
+        // const contactForm = document.getElementById('contact-form');
+        // const submitButton = document.getElementById('submit-button');
+        // const formMessage = document.getElementById('form-message');
 
-        /** Selects a new color scheme index by cycling through the available schemes */
-        function getRandomColorSchemeIndex() {
-            // Cycles sequentially through the available schemes (0, 1, 2, 3, then back to 0)
-            if (toggleCount % 2 === 0) {
-                 currentSchemeIndex = (currentSchemeIndex + 1) % COLOR_SCHEMES.length;
-            }
-            return currentSchemeIndex;
-        }
 
-        /** Applies the colors based on the current scheme and mode */
-        function applyTheme() {
-            // Ensure index is within bounds (0 to N-1)
-            const schemeIndex = currentSchemeIndex % COLOR_SCHEMES.length; 
-            const [lightBg, lightText, darkBg, darkText] = COLOR_SCHEMES[schemeIndex];
-            
-            let bgColor, textColor;
-            let logoUrl;
-            let themeSVG;
+        // --- Core Functions ---
 
-            if (isDayMode) {
-                bgColor = lightBg;
-                textColor = lightText;
-                body.classList.remove('dark');
-                themeSVG = SUN_SVG;
-                logoUrl = LOGO_IMAGES[schemeIndex].day; // Get the specific light logo
-            } else {
-                bgColor = darkBg;
-                textColor = darkText;
-                body.classList.add('dark');
-                themeSVG = MOON_SVG;
-                logoUrl = LOGO_IMAGES[schemeIndex].night; // Get the specific dark logo
-            }
+        /** Selects a new color scheme index by cycling through the available schemes */
+        function getRandomColorSchemeIndex() {
+            // Cycles sequentially through the available schemes (0, 1, 2, 3, then back to 0)
+            if (toggleCount % 2 === 0) {
+                 currentSchemeIndex = (currentSchemeIndex + 1) % COLOR_SCHEMES.length;
+            }
+            return currentSchemeIndex;
+        }
 
-            // Set CSS custom properties
-            root.setProperty('--bg', bgColor);
-            root.setProperty('--text', textColor);
-            
-            // Adjust accent to ensure contrast on hover (still used for calculating accentBase, but button hover no longer relies on it)
-            const accentBase = isDayMode ? darkText : lightText;
-            root.setProperty('--accent', accentBase);
+        /** Applies the colors based on the current scheme and mode */
+        function applyTheme() {
+            // Ensure index is within bounds (0 to N-1)
+            const schemeIndex = currentSchemeIndex % COLOR_SCHEMES.length; 
+            const [lightBg, lightText, darkBg, darkText] = COLOR_SCHEMES[schemeIndex];
+            
+            let bgColor, textColor;
+            let logoUrl;
+            let themeSVG;
 
-            // Update theme icons in both locations
-            themeIconCard.innerHTML = themeSVG;
-            themeIconContact.innerHTML = themeSVG;
+            if (isDayMode) {
+                bgColor = lightBg;
+                textColor = lightText;
+                body.classList.remove('dark');
+                themeSVG = SUN_SVG;
+                logoUrl = LOGO_IMAGES[schemeIndex].day; // Get the specific light logo
+            } else {
+                bgColor = darkBg;
+                textColor = darkText;
+                body.classList.add('dark');
+                themeSVG = MOON_SVG;
+                logoUrl = LOGO_IMAGES[schemeIndex].night; // Get the specific dark logo
+            }
 
-            // Update the logo image source
-            if (logoImg) {
-                logoImg.src = logoUrl;
-            }
-        }
+            // Set CSS custom properties
+            root.setProperty('--bg', bgColor);
+            root.setProperty('--text', textColor);
+            
+            // Adjust accent to ensure contrast on hover (still used for calculating accentBase, but button hover no longer relies on it)
+            const accentBase = isDayMode ? darkText : lightText;
+            root.setProperty('--accent', accentBase);
 
-        /** Toggles between day and night mode, and cycles the scheme every second toggle */
-        function toggleTheme() {
-            isDayMode = !isDayMode;
-            toggleCount++; // Increment count
-            
-            // Change color scheme only when switching back to Day Mode (even toggleCount)
-            if (toggleCount % 2 === 0) {
-                getRandomColorSchemeIndex(); 
-            }
-            
-            applyTheme();
-        }
+            // Update theme icons in both locations
+            themeIconCard.innerHTML = themeSVG;
+            themeIconContact.innerHTML = themeSVG;
 
-        /** Checks the current time and sets the default theme */
-        function checkDefaultMode() {
-            const hour = new Date().getHours();
-            // 6 AM (inclusive) to 6 PM (exclusive) is day mode
-            isDayMode = (hour >= 6 && hour < 18);
-            
-            // Start with scheme 0
-            currentSchemeIndex = 0; 
-            
-            applyTheme();
-        }
+            // Update the logo image source
+            if (logoImg) {
+                logoImg.src = logoUrl;
+            }
+        }
 
-        /** Updates all text based on the selected language and updates the toggle button */
-        function switchLanguage(lang) {
-            currentLanguage = lang;
-            const content = CONTENT[lang];
+        /** Toggles between day and night mode, and cycles the scheme every second toggle */
+        function toggleTheme() {
+            isDayMode = !isDayMode;
+            toggleCount++; // Increment count
+            
+            // Change color scheme only when switching back to Day Mode (even toggleCount)
+            if (toggleCount % 2 === 0) {
+                getRandomColorSchemeIndex(); 
+            }
+            
+            applyTheme();
+        }
 
-            document.getElementById('name').textContent = content.name;
-            document.getElementById('title').textContent = content.title;
-            document.getElementById('bio-text').textContent = content.bio;
-            document.getElementById('click-prompt').textContent = content.clickPrompt;
-            contactHeader.textContent = content.contactHeader;
-            contactFooter.textContent = content.contactFooter;
-            
-            // Update form labels and button text
+        /** Checks the current time and sets the default theme */
+        function checkDefaultMode() {
+            const hour = new Date().getHours();
+            // 6 AM (inclusive) to 6 PM (exclusive) is day mode
+            isDayMode = (hour >= 6 && hour < 18);
+            
+            // Start with scheme 0
+            currentSchemeIndex = 0; 
+            
+            applyTheme();
+        }
+
+        /** Updates all text based on the selected language and updates the toggle button */
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            const content = CONTENT[lang];
+
+            document.getElementById('name').textContent = content.name;
+            document.getElementById('title').textContent = content.title;
+            document.getElementById('bio-text').textContent = content.bio;
+            document.getElementById('click-prompt').textContent = content.clickPrompt;
+            contactHeader.textContent = content.contactHeader;
+            contactFooter.textContent = content.contactFooter;
+            
+            // Removed custom form label and button updates:
+            /*
             document.getElementById('label-name').textContent = content.labelName;
-            document.getElementById('label-email').textContent = content.labelEmail;
-            document.getElementById('label-message').textContent = content.labelMessage;
-            submitButton.textContent = content.buttonSend;
+            document.getElementById('label-email').textContent = content.labelEmail;
+            document.getElementById('label-message').textContent = content.labelMessage;
+            submitButton.textContent = content.buttonSend;
+            */
 
-            // Update the language toggle icons in both locations
-            const langCode = currentLanguage.toUpperCase();
-            langIconCard.textContent = langCode;
-            langIconContact.textContent = langCode;
-        }
+            // Update the language toggle icons in both locations
+            const langCode = currentLanguage.toUpperCase();
+            langIconCard.textContent = langCode;
+            langIconContact.textContent = langCode;
+        }
 
-        /** Toggles the language to the alternate one */
-        function toggleLanguage() {
-            const nextLang = currentLanguage === 'en' ? 'pt' : 'en';
-            switchLanguage(nextLang);
-        }
+        /** Toggles the language to the alternate one */
+        function toggleLanguage() {
+            const nextLang = currentLanguage === 'en' ? 'pt' : 'en';
+            switchLanguage(nextLang);
+        }
 
-        /** Shows/hides the bio section */
-        function toggleBio(show) {
-            bioVisible = show;
-            bioContent.classList.toggle('visible', show);
-            // On click, keep it visible until the next click
-            if (show) {
-                // Remove prompt when bio is visible
-                document.getElementById('click-prompt').style.display = 'none';
-            } else {
-                // Show prompt when bio is hidden (only if it was hidden by click)
-                if (window.matchMedia('(hover: none)').matches) {
-                    document.getElementById('click-prompt').style.display = 'block';
-                }
-            }
-        }
-        
-        /** Shows or hides the contact form overlay */
-        function showContactForm(show) {
-            contactOverlay.classList.toggle('visible', show);
-            // Hide main card controls when overlay is visible
-            document.querySelector('.fixed.top-0.right-0').style.visibility = show ? 'hidden' : 'visible';
-            
-            // Clear form and message when showing or hiding
-            if (show) {
-                formMessage.textContent = '';
-                // Enable button only if form is valid on entry
-                updateSubmitButtonState();
-            }
-        }
-        
-        /** Handles form submission to Google Forms endpoint */
-        async function submitForm(event) {
-            event.preventDefault();
-
-            submitButton.disabled = true;
-            submitButton.textContent = 'Sending...';
-            formMessage.textContent = '';
-            
-            // Google Forms submission requires 'Content-Type': 'application/x-www-form-urlencoded'
-            // The FormData object naturally handles this encoding.
-            const formData = new FormData(contactForm);
-
-            try {
-                // Use the form response endpoint for silent submission
-                const response = await fetch(FORM_SUBMISSION_URL, {
-                    method: 'POST',
-                    body: formData,
-                    // Note: No 'Content-Type' header is needed for fetch with FormData, 
-                    // as the browser sets it correctly for form-urlencoded data.
-                    mode: 'no-cors' // Crucial for submitting to external, CORS-restricted endpoints like Google Forms
-                });
-
-                // Since we use 'no-cors', we can't inspect the response status directly. 
-                // A successful fetch call (no network error) is usually sufficient confirmation for Google Forms.
-                
-                formMessage.textContent = CONTENT[currentLanguage].msgSuccess;
-                formMessage.classList.remove('text-red-500');
-                formMessage.classList.add('text-green-500');
-                contactForm.reset(); // Clear form on successful submission
-                updateSubmitButtonState(); // Re-disable button after reset
-
-            } catch (error) {
-                console.error('Submission Error:', error);
-                formMessage.textContent = CONTENT[currentLanguage].msgError;
-                formMessage.classList.remove('text-green-500');
-                formMessage.classList.add('text-red-500');
-            } finally {
-                submitButton.textContent = CONTENT[currentLanguage].buttonSend;
-                submitButton.disabled = false;
-            }
-        }
-        
-        /** Enables/disables the submit button based on form validity */
-        function updateSubmitButtonState() {
-            submitButton.disabled = !contactForm.checkValidity();
-        }
+        /** Shows/hides the bio section */
+        function toggleBio(show) {
+            bioVisible = show;
+            bioContent.classList.toggle('visible', show);
+            // On click, keep it visible until the next click
+            if (show) {
+                // Remove prompt when bio is visible
+                document.getElementById('click-prompt').style.display = 'none';
+            } else {
+                // Show prompt when bio is hidden (only if it was hidden by click)
+                if (window.matchMedia('(hover: none)').matches) {
+                    document.getElementById('click-prompt').style.display = 'block';
+                }
+            }
+        }
+        
+        /** Shows or hides the contact form overlay */
+        function showContactForm(show) {
+            contactOverlay.classList.toggle('visible', show);
+            // Hide main card controls when overlay is visible
+            document.querySelector('.fixed.top-0.right-0').style.visibility = show ? 'hidden' : 'visible';
+            
+            // Clear form and message when showing or hiding
+            if (show) {
+                // Since the form is embedded, we just clear the submit message (if it were visible)
+                // formMessage.textContent = ''; 
+                // updateSubmitButtonState(); // Not needed for embedded form
+            }
+        }
+        
+        // Removed custom form submission functions:
+        /*
+        async function submitForm(event) { ... }
+        function updateSubmitButtonState() { ... }
+        */
 
 
-        // --- Event Listeners and Initialization ---
+        // --- Event Listeners and Initialization ---
 
-        // 1. Theme Toggles (Bound to both card and contact buttons)
-        themeToggleCard.addEventListener('click', toggleTheme);
-        themeToggleContact.addEventListener('click', toggleTheme);
+        // 1. Theme Toggles (Bound to both card and contact buttons)
+        themeToggleCard.addEventListener('click', toggleTheme);
+        themeToggleContact.addEventListener('click', toggleTheme);
 
-        // 2. Language Switches (Bound to both card and contact buttons)
-        langToggleCard.addEventListener('click', toggleLanguage);
-        langToggleContact.addEventListener('click', toggleLanguage);
-        
-        // 3. Contact Form Navigation
-        contactLink.addEventListener('click', () => showContactForm(true));
-        backButton.addEventListener('click', () => showContactForm(false));
-        
-        // 4. Form Submission and Validation
-        contactForm.addEventListener('submit', submitForm);
-        // Check form validity on input change
-        contactForm.addEventListener('input', updateSubmitButtonState);
+        // 2. Language Switches (Bound to both card and contact buttons)
+        langToggleCard.addEventListener('click', toggleLanguage);
+        langToggleContact.addEventListener('click', toggleLanguage);
+        
+        // 3. Contact Form Navigation
+        contactLink.addEventListener('click', () => showContactForm(true));
+        backButton.addEventListener('click', () => showContactForm(false));
+        
+        // 4. Removed Form Submission and Validation listeners:
+        /*
+        contactForm.addEventListener('submit', submitForm);
+        contactForm.addEventListener('input', updateSubmitButtonState);
+        */
 
-        // 5. Bio Interaction (Handles both hover for desktop and click for touch/desktop)
-        
-        // Desktop Hover (Mousing over the card)
-        cardContainer.addEventListener('mouseenter', () => {
-             // Only show on mouseenter if a pointer is available
-             if (window.matchMedia('(hover: hover)').matches) {
-                toggleBio(true);
-             }
-        });
-        cardContainer.addEventListener('mouseleave', () => {
-             // Only hide on mouseleave if it's a desktop device
-             if (window.matchMedia('(hover: hover)').matches) {
-                toggleBio(false);
-             }
-        });
+        // 5. Bio Interaction (Handles both hover for desktop and click for touch/desktop)
+        
+        // Desktop Hover (Mousing over the card)
+        cardContainer.addEventListener('mouseenter', () => {
+             // Only show on mouseenter if a pointer is available
+             if (window.matchMedia('(hover: hover)').matches) {
+                toggleBio(true);
+             }
+        });
+        cardContainer.addEventListener('mouseleave', () => {
+             // Only hide on mouseleave if it's a desktop device
+             if (window.matchMedia('(hover: hover)').matches) {
+                toggleBio(false);
+             }
+        });
 
-        // Touch/Click Interaction (Toggles visibility)
-        cardContainer.addEventListener('click', () => {
-            // Toggle visibility on click/tap
-            toggleBio(!bioVisible);
-        });
+        // Touch/Click Interaction (Toggles visibility)
+        cardContainer.addEventListener('click', () => {
+            // Toggle visibility on click/tap
+            toggleBio(!bioVisible);
+        });
 
 
-        // 6. Initial Setup
-        window.onload = function() {
-            checkDefaultMode(); // Set initial day/night mode and scheme 0
-            switchLanguage(currentLanguage); // Load default language content (initial 'en')
-        };
-    </script>
+        // 6. Initial Setup
+        window.onload = function() {
+            checkDefaultMode(); // Set initial day/night mode and scheme 0
+            switchLanguage(currentLanguage); // Load default language content (initial 'en')
+        };
+    </script>
 </body>
 </html>
-
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
