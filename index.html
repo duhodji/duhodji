@@ -186,25 +186,30 @@
                     <!-- Name Field -->
                     <div>
                         <label for="name-input" id="label-name" class="block text-sm font-medium theme-text mb-1">Your Name</label>
-                        <input type="text" id="name-input" name="entry.2005620554" required class="w-full p-3 border-2 theme-border theme-bg rounded-lg focus:ring-2 focus:ring-[--text] focus:border-transparent outline-none">
+                        <input type="text" id="name-input" name="entry.2005620554" class="w-full p-3 border-2 theme-border theme-bg rounded-lg focus:ring-2 focus:ring-[--text] focus:border-transparent outline-none">
                     </div>
 
                     <!-- Email Field -->
                     <div>
                         <label for="email-input" id="label-email" class="block text-sm font-medium theme-text mb-1">Your Email</label>
-                        <input type="email" id="email-input" name="entry.1045781291" required class="w-full p-3 border-2 theme-border theme-bg rounded-lg focus:ring-2 focus:ring-[--text] focus:border-transparent outline-none">
+                        <input type="text" id="email-input" name="entry.1045781291" class="w-full p-3 border-2 theme-border theme-bg rounded-lg focus:ring-2 focus:ring-[--text] focus:border-transparent outline-none">
                     </div>
 
                     <!-- Message Field -->
                     <div>
                         <label for="message-input" id="label-message" class="block text-sm font-medium theme-text mb-1">Message</label>
-                        <textarea id="message-input" name="entry.839337160" rows="5" required class="w-full p-3 border-2 theme-border theme-bg rounded-lg focus:ring-2 focus:ring-[--text] focus:border-transparent outline-none resize-none"></textarea>
+                        <textarea id="message-input" name="entry.839337160" rows="5" class="w-full p-3 border-2 theme-border theme-bg rounded-lg focus:ring-2 focus:ring-[--text] focus:border-transparent outline-none resize-none"></textarea>
                     </div>
 
                     <!-- Submit Button -->
                     <button type="submit" id="submit-button" class="w-full py-3 rounded-lg font-bold transition duration-300" disabled>
                         Send Message
                     </button>
+
+                    <div class="text-center mt-2 text-sm theme-text opacity-75"> <!--2=4, xs=sm-->
+                        <a id="direct-form-link" href="https://forms.gle/eQ7b9Z1hFbQqorsG9" target="_blank" class="hover:opacity-100 opacity-80 transition duration-300 text-center">
+                        </a>
+                    </div>
 
                     <div id="form-message" class="text-center font-medium mt-4"></div>
                 </form>
@@ -269,7 +274,8 @@
                 labelMessage: "Message",
                 buttonSend: "Send Message",
                 msgSuccess: "Message sent! Thank you for reaching out.",
-                msgError: "Error sending message. Please try again later."
+                msgError: "Error sending message. Please try again later.",
+                linkHelp: "Having trouble submitting? Access the direct link from here" // NEW
             },
             pt: {
                 name: "du hodji",
@@ -285,7 +291,9 @@
                 labelMessage: "Mensagem",
                 buttonSend: "Enviar Mensagem",
                 msgSuccess: "Mensagem enviada! Obrigado por entrar em contato.",
-                msgError: "Erro ao enviar mensagem. Por favor, tente novamente mais tarde."
+                msgError: "Erro ao enviar mensagem. Por favor, tente novamente mais tarde.",
+                linkHelp: "Está com dificuldades para enviar? Acesse o link direto aqui." // NEW
+
             }
         };
 
@@ -424,6 +432,9 @@
             document.getElementById('label-message').textContent = content.labelMessage;
             submitButton.textContent = content.buttonSend;
 
+            // NEW: Update the direct link text
+            document.getElementById('direct-form-link').textContent = content.linkHelp;
+
             // Update the language toggle icons in both locations
             const langCode = currentLanguage.toUpperCase();
             langIconCard.textContent = langCode;
@@ -461,7 +472,7 @@
             // Clear form and message when showing or hiding
             if (show) {
                 formMessage.textContent = '';
-                // Enable button only if form is valid on entry
+                // Ensure button is enabled on entry
                 updateSubmitButtonState();
             }
         }
@@ -495,7 +506,7 @@
                 formMessage.classList.remove('text-red-500');
                 formMessage.classList.add('text-green-500');
                 contactForm.reset(); // Clear form on successful submission
-                updateSubmitButtonState(); // Re-disable button after reset
+                updateSubmitButtonState(); // Ensure button is enabled after reset
 
             } catch (error) {
                 console.error('Submission Error:', error);
@@ -510,7 +521,7 @@
         
         /** Enables/disables the submit button based on form validity */
         function updateSubmitButtonState() {
-            submitButton.disabled = !contactForm.checkValidity();
+            submitButton.disabled = false;
         }
 
 
@@ -531,7 +542,7 @@
         // 4. Form Submission and Validation
         contactForm.addEventListener('submit', submitForm);
         // Check form validity on input change
-        contactForm.addEventListener('input', updateSubmitButtonState);
+//        contactForm.addEventListener('input', updateSubmitButtonState);
 
         // 5. Bio Interaction (Handles both hover for desktop and click for touch/desktop)
         
@@ -567,3 +578,4 @@
 
 </body>
 </html>
+
