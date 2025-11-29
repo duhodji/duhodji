@@ -402,17 +402,19 @@
             applyTheme();
         }
 
-        /** Checks the current time and sets the default theme */
-        function checkDefaultMode() {
-            const hour = new Date().getHours();
-            // 6 AM (inclusive) to 6 PM (exclusive) is day mode
-            isDayMode = (hour >= 6 && hour < 18);
-            
-            // Start with scheme 0
-            currentSchemeIndex = 0; 
-            
-            applyTheme();
-        }
+        /** Checks the user's operating system's color preference and sets the default theme */
+function checkDefaultMode() {
+    // Check if the user's system prefers a dark color scheme
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // Set isDayMode based on the preference (if prefersDark is true, isDayMode is false)
+    isDayMode = !prefersDark;
+    
+    // Start with scheme 0
+    currentSchemeIndex = 0;
+    
+    applyTheme();
+}
 
         /** Updates all text based on the selected language and updates the toggle button */
         function switchLanguage(lang) {
@@ -578,6 +580,7 @@
 
 </body>
 </html>
+
 
 
 
