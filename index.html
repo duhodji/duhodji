@@ -231,19 +231,17 @@
         // --- Configuration ---
         // Updated schemes based on user request:
         const COLOR_SCHEMES = [
-//            // Scheme 0: [LightBG, LightText, DarkBG, DarkText] - Dark Chocolate/Pale Cream
-//            ['#f8b6e3', '#2f1a0c', '#2f1a0c', '#f8b6e3'], 
-// plus E4D4BB (Light Toasted Almond), B8860B (Golden Caramel), 4F301F (Deep Roast)            
             // Scheme 0: [LightBG, LightText, DarkBG, DarkText] - Grey/White
             ['#f2f2f2', '#4a4a4a', '#4a4a4a', '#f2f2f2'], 
             // Scheme 1: [LightBG, LightText, DarkBG, DarkText] - Cream/Maroon
             ['#f0ebe7', '#554040', '#554040', '#f0ebe7'], 
             // Scheme 2: [LightBG, LightText, DarkBG, DarkText] - Mint/Moss
             ['#e7f0e7', '#4a504a', '#4a504a', '#e7f0e7'], 
-            // Scheme 3: [LightBG, LightText, DarkBG, DarkText] - Lavender/Indigo
-            ['#faf7ff', '#3e375d', '#3e375d', '#faf7ff']
-            // Scheme 4: [LightBG, LightText, DarkBG, DarkText] - Smoky-brown/Off-white
-      //      ['#d6d5d4', '#4c4b4a', '4c4b4a', '#d6d5d4']
+            // Scheme 3: [LightBG, LightText, DarkBG, DarkText] - Dark Chocolate/Pale Cream
+            ['#f8b6e3', '#2f1a0c', '#2f1a0c', '#f8b6e3'], 
+// plus E4D4BB (Light Toasted Almond), B8860B (Golden Caramel), 4F301F (Deep Roast)            
+//            // Scheme 3: [LightBG, LightText, DarkBG, DarkText] - Lavender/Indigo
+//            ['#faf7ff', '#3e375d', '#3e375d', '#faf7ff']
         ];
 
         // NEW: Map of logo image URLs based on scheme index and mode
@@ -254,8 +252,10 @@
             { day: "duhodji_rd_dy.png", night: "duhodji_rd_nt.png" },
             // Scheme 2: Mint/Moss
             { day: "duhodji_gn_dy.png", night: "duhodji_gn_nt.png" },
-            // Scheme 3: Lavender/Indigo
-            { day: "duhodji_be_dy.png", night: "duhodji_be_nt.png" }
+            // Scheme 3: Dark Chocolate/Pale Cream
+            { day: "duhodji_bn_dy.png", night: "duhodji_bn_nt.png" }
+//            // Scheme 3: Lavender/Indigo
+//            { day: "duhodji_be_dy.png", night: "duhodji_be_nt.png" }
         ];
         // IMPORTANT: Replace the "PATH/TO/..." strings above with your actual image URLs.
 
@@ -585,6 +585,7 @@ function checkDefaultMode() {
 
 </body>
 </html>
+
 
 
 
